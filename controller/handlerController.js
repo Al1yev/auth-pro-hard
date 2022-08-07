@@ -1,6 +1,6 @@
 const catchErrorAsync = require("../utility/catchErrorAsyncModel");
 const AppError = require("../utility/appError");
-const resFunc = require("../utility/resJson.js");
+const resFunc = require("../utility/resFunc.js");
 
 const getAllData = catchErrorAsync(async (req, res, next, Model) => {
   const data = await Model.find();
