@@ -1,0 +1,32 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="./css/style.css")
+    title Admin
+  body 
+    .navbar
+      .profil
+        .profil__img
+          img(src=`./img/${data[0].image}` alt='' srcset='')
+        .profil__name
+          h3.profil__name--name data[0].firstName data[0].lastName
+          p.profil__name--status if (data[0].role=="admin") Admin else data[0].team 
+      if (data[0].role == "admin")
+        .commands
+          button.commands__card
+            h2.commats__card--text Get All Courses
+
+    .content
+      .content__theme
+        h1 Users
+      .content__user
+        each user in data
+          .content__user-card
+            .content__user-card--image
+              img(src=`./img/${user.image||"profil.jfif"}` alt='' srcset='')
+            h2.content__user-card--name user.firstName user.lastName
+            p.content__user-card--team user.team
+  
