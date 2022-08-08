@@ -8,13 +8,33 @@ router.route("/signup").post(authController.signUp);
 
 router
   .route("/")
-  .get(authController.protect, userController.getAllUser)
-  .post(authController.protect, userController.createNewUser);
+  .get(
+    authController.protect,
+    authController.roleChecker(["admin"]),
+    userController.getAllUser
+  )
+  .post(
+    authController.protect,
+    authController.roleChecker(["admin"]),
+    userController.createNewUser
+  );
 
 router
   .route("/:id")
-  .get(authController.protect, userController.getOneUser)
-  .patch(authController.protect, userController.updateUser)
-  .delete(authController.protect, userController.deleteUser);
+  .get(
+    authController.protect,
+    authController.roleChecker(["admin"]),
+    userController.getOneUser
+  )
+  .patch(
+    authController.protect,
+    authController.roleChecker(["admin"]),
+    userController.updateUser
+  )
+  .delete(
+    authController.protect,
+    authController.roleChecker(["admin"]),
+    userController.deleteUser
+  );
 
 module.exports = router;

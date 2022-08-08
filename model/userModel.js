@@ -2,18 +2,18 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 userSchema = mongoose.Schema({
-  firstName: {
+  name: {
     type: String,
-    required: [true, "Please enter your firstname"],
-  },
-  lastName: {
-    type: String,
-    required: [true, "Please enter your lastname"],
+    required: [true, "Please enter your name"],
   },
   email: {
     type: String,
     required: [true, "Please enter your email"],
     utility: true,
+  },
+  image: {
+    type: String,
+    default: "profil.jfif",
   },
   password: {
     type: String,

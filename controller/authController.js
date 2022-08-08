@@ -5,6 +5,8 @@ const resFunc = require("../utility/resFunc");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// Helper functions
+
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -16,6 +18,17 @@ const saveTokenCookie = (token, res, req) => {
     maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: req.protocol === "https" ? true : false,
+  });
+};
+
+// Middlewares
+
+const roleChecker = (roles) => {
+  return catchErrorAsync(async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("You have not access to do it!", 401));
+    }
+    next();
   });
 };
 
@@ -37,7 +50,7 @@ const protect = catchErrorAsync(async (req, res, next) => {
   const user = await User.findById(compareToken.id);
 
   if (!user) {
-    return next(new AppError("User isn't found!", 401));
+    return next(new AppError("User is not found when authorization!", 401));
   }
 
   if (user.passwordChangedDate) {
@@ -45,10 +58,7 @@ const protect = catchErrorAsync(async (req, res, next) => {
     console.log(compareToken.iat);
     if (user.passwordChangedDate.getTime() / 1000 > compareToken.iat) {
       return next(
-        new AppError(
-          "Sizning tokeningiz yaroqsiz! Iltimos qayta tizimga kiring!",
-          401
-        )
+        new AppError("Your token is not accessed! Please log in!", 401)
       );
     }
   }
@@ -57,6 +67,8 @@ const protect = catchErrorAsync(async (req, res, next) => {
   res.locals.user = user;
   next();
 });
+
+// Main Functions
 
 const signUp = catchErrorAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -80,18 +92,19 @@ const signIn = catchErrorAsync(async (req, res, next) => {
     return next(new AppError("Password or Login isn't entered!", 404));
 
   const user = await User.findOne({ email }).select("+password");
-  console.log(user);
-
   if (!user) return next(new AppError("User isn't found!", 404));
+
   const comparePassword = await bcrypt.compare(password, user.password);
-  console.log(comparePassword);
   if (!comparePassword) return next(new AppError("Password is wrong!", 404));
+
   const token = createToken(user._id);
   saveTokenCookie(token, res, req);
+
   resFunc(res, 200, "Successfully logged in", {}, token);
 });
 
 module.exports = {
+  roleChecker,
   protect,
   signIn,
   signUp,
